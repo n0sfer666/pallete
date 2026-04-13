@@ -1,0 +1,16 @@
+[package]
+name = "parser"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+description = "Парсер палитр из текста (ASCII/Markdown-таблицы, CSS/SCSS, hex-списки)"
+
+[dependencies]
+serde = { workspace = true }
+thiserror = { workspace = true }
+regex = { workspace = true }
+once_cell = { workspace = true }
+
+[dev-dependencies]
+insta = "1"
