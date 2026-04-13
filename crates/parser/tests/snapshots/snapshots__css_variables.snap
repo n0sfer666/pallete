@@ -1,0 +1,16 @@
+---
+source: crates/parser/tests/snapshots.rs
+expression: result
+---
+palettes:
+  - name: Variables
+    colors:
+      - hex: "#3366FF"
+        alpha: 1
+        name: primary
+      - hex: "#E53935"
+        alpha: 1
+        name: accent
+      - hex: "#FAFAFA"
+        alpha: 1
+        name: bg

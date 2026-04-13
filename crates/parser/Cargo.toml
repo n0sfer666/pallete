@@ -13,4 +13,4 @@ regex = { workspace = true }
 once_cell = { workspace = true }
 
 [dev-dependencies]
-insta = "1"
+insta = { version = "1", features = ["yaml"] }

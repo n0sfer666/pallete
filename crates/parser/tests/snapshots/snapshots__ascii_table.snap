@@ -1,0 +1,38 @@
+---
+source: crates/parser/tests/snapshots.rs
+expression: result
+---
+palettes:
+  - name: CASH
+    colors:
+      - hex: "#66BB6A"
+        alpha: 1
+        name: ~
+      - hex: "#43A047"
+        alpha: 1
+        name: ~
+      - hex: "#2E7D32"
+        alpha: 1
+        name: ~
+  - name: DEBT
+    colors:
+      - hex: "#E53935"
+        alpha: 1
+        name: ~
+      - hex: "#C62828"
+        alpha: 1
+        name: ~
+      - hex: "#B71C1C"
+        alpha: 1
+        name: ~
+  - name: NEUTRAL
+    colors:
+      - hex: "#FAFAFA"
+        alpha: 1
+        name: ~
+      - hex: "#EEEEEE"
+        alpha: 1
+        name: ~
+      - hex: "#BDBDBD"
+        alpha: 1
+        name: ~

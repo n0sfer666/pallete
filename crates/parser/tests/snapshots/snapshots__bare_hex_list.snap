@@ -1,0 +1,19 @@
+---
+source: crates/parser/tests/snapshots.rs
+expression: result
+---
+palettes:
+  - name: Palette 1
+    colors:
+      - hex: "#111111"
+        alpha: 1
+        name: ~
+      - hex: "#222222"
+        alpha: 1
+        name: ~
+      - hex: "#333333"
+        alpha: 1
+        name: ~
+      - hex: "#444444"
+        alpha: 1
+        name: ~

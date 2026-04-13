@@ -1,0 +1,21 @@
+---
+source: crates/parser/tests/snapshots.rs
+expression: result
+---
+palettes:
+  - name: Ocean
+    colors:
+      - hex: "#2196F3"
+        alpha: 1
+        name: ~
+      - hex: "#0D47A1"
+        alpha: 1
+        name: ~
+  - name: Forest
+    colors:
+      - hex: "#4CAF50"
+        alpha: 1
+        name: ~
+      - hex: "#1B5E20"
+        alpha: 1
+        name: ~

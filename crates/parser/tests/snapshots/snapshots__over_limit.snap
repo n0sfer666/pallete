@@ -1,0 +1,5 @@
+---
+source: crates/parser/tests/snapshots.rs
+expression: err.to_string()
+---
+"input exceeds limits: 0 chars, 10001 colors"
