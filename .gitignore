@@ -1,0 +1,31 @@
+# Node
+node_modules/
+dist/
+.vite/
+*.log
+.pnpm-store/
+
+# Rust
+target/
+**/*.rs.bk
+Cargo.lock.bak
+
+# Tauri
+src-tauri/target/
+src-tauri/gen/
+
+# macOS
+.DS_Store
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Env
+.env
+.env.local
+
+# Test snapshots pending
+**/*.snap.new
