@@ -1,0 +1,75 @@
+.head {
+  display: flex;
+  gap: var(--spacing-2);
+  align-items: center;
+  margin-block-end: var(--spacing-3);
+}
+
+.nameInput {
+  flex: 1;
+  font-size: var(--font-size-lg);
+  font-weight: 600;
+}
+
+.colorList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-1);
+}
+
+.colorRow {
+  display: grid;
+  grid-template-columns: 32px 80px 1fr 80px 24px;
+  gap: var(--spacing-2);
+  align-items: center;
+  padding-block: var(--spacing-2);
+  padding-inline: var(--spacing-2);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  font-size: var(--font-size-sm);
+}
+
+.colorRow:hover {
+  background: var(--color-surface-hover);
+}
+
+.selected {
+  background: var(--color-selected);
+}
+
+.chip {
+  inline-size: 32px;
+  block-size: 32px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--color-border);
+}
+
+.hex {
+  font-family: ui-monospace, 'SF Mono', Menlo, monospace;
+  cursor: pointer;
+}
+
+.hex:hover {
+  color: var(--color-accent);
+}
+
+.name, .role {
+  color: var(--color-text-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.remove {
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-lg);
+  padding: 0;
+  line-height: 1;
+}
+
+.remove:hover {
+  color: var(--color-danger);
+}

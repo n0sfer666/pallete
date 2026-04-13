@@ -1,0 +1,58 @@
+.palette {
+  padding: var(--spacing-3);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  margin-block-end: var(--spacing-2);
+}
+
+.palette:hover {
+  background: var(--color-surface-hover);
+}
+
+.active {
+  background: var(--color-selected);
+}
+
+.head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-block-end: var(--spacing-2);
+}
+
+.name {
+  font-weight: 600;
+  font-size: var(--font-size-sm);
+}
+
+.rename {
+  font-weight: 600;
+  font-size: var(--font-size-sm);
+  inline-size: 100%;
+}
+
+.trash {
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  padding: 2px;
+  opacity: 0;
+  font-size: var(--font-size-md);
+}
+
+.palette:hover .trash {
+  opacity: 1;
+}
+
+.swatchRow {
+  display: flex;
+  gap: 2px;
+  block-size: 32px;
+}
+
+.swatch {
+  flex: 1;
+  min-inline-size: 16px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--color-border);
+}

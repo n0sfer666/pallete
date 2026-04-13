@@ -1,9 +1,16 @@
-import type { Component } from 'solid-js';
+import { onMount, type Component } from 'solid-js';
+import { Layout } from '~/components/Layout';
+import { loadWorkspace } from '~/store/workspace';
+import { useThemeSync } from '~/store/theme';
+import { useGlobalShortcuts } from '~/hooks/useGlobalShortcuts';
 
 export const App: Component = () => {
-  return (
-    <main>
-      <h1>Pallete</h1>
-    </main>
-  );
+  useThemeSync();
+  useGlobalShortcuts();
+
+  onMount(() => {
+    void loadWorkspace();
+  });
+
+  return <Layout />;
 };

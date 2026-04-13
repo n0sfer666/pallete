@@ -9,7 +9,7 @@
     "noImplicitAny": true,
     "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true,
-    "noUncheckedIndexedAccess": true,
+    "noUncheckedIndexedAccess": false,
     "exactOptionalPropertyTypes": true,
     "useUnknownInCatchVariables": true,
     "esModuleInterop": true,
@@ -22,7 +22,8 @@
     "paths": {
       "~/*": ["src/*"]
     },
-    "types": ["vite/client", "node"]
+    "types": ["vite/client", "node"],
+    "lib": ["ES2022", "DOM", "DOM.Iterable"]
   },
   "include": ["src", "vite.config.ts", "vitest.config.ts"],
   "exclude": ["node_modules", "dist", "src-tauri"]

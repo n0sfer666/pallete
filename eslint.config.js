@@ -31,6 +31,8 @@ export default [
         ClipboardEvent: 'readonly',
         FileReader: 'readonly',
         File: 'readonly',
+        EventTarget: 'readonly',
+        crypto: 'readonly',
       },
     },
     plugins: {
