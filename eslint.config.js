@@ -50,6 +50,6 @@ export default [
     },
   },
   {
-    ignores: ['dist/**', 'node_modules/**', 'src-tauri/**', 'crates/**', '**/*.config.{js,ts}'],
+    ignores: ['dist/**', 'node_modules/**', 'src-tauri/**', 'crates/**', 'target/**', '**/*.config.{js,ts}'],
   },
 ];
