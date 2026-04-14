@@ -4,6 +4,7 @@ import { parseText } from '~/ipc/commands';
 import { run } from '~/store/undo';
 import { projectState } from '~/store/project';
 import { setProject } from '~/store/project';
+import { workspaceState } from '~/store/workspace';
 import { uuid } from '~/lib/uuid';
 
 export type DuplicateStrategy = 'merge' | 'replace' | 'skip';
@@ -29,7 +30,10 @@ const [state, setState] = createStore<ImportState>({
 export { state as importState };
 
 export const openImport = (initialText: string): void => {
-  setState({ open: true, text: initialText, options: {}, result: null, error: null });
+  const defaults: ParseOptionsDto = {
+    acceptHexWithoutHash: workspaceState.workspace?.settings.acceptHexWithoutHash ?? false,
+  };
+  setState({ open: true, text: initialText, options: defaults, result: null, error: null });
   void reparse();
 };
 

@@ -1,6 +1,7 @@
 import { For, type Component } from 'solid-js';
 import { open } from '@tauri-apps/plugin-dialog';
 import { projectState } from '~/store/project';
+import { openSettings } from '~/store/settings-dialog';
 import {
   workspaceState,
   openProject,
@@ -69,6 +70,9 @@ export const ProjectsColumn: Component = () => {
       <div class={styles.columnFooter}>
         <button onClick={handleNew}>+ Новый</button>
         <button onClick={handleOpenFolder}>Открыть…</button>
+        <button onClick={openSettings} title="Настройки" style={{ 'margin-inline-start': 'auto' }}>
+          ⚙
+        </button>
       </div>
     </div>
   );

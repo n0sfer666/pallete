@@ -1,6 +1,7 @@
 import { onMount, type Component } from 'solid-js';
 import { Layout } from '~/components/Layout';
 import { ImportDialog } from '~/components/ImportDialog';
+import { SettingsDialog } from '~/components/SettingsDialog';
 import { loadWorkspace } from '~/store/workspace';
 import { useThemeSync } from '~/store/theme';
 import { useGlobalShortcuts } from '~/hooks/useGlobalShortcuts';
@@ -21,6 +22,7 @@ export const App: Component = () => {
     <>
       <Layout />
       <ImportDialog />
+      <SettingsDialog />
     </>
   );
 };
