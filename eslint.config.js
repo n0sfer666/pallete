@@ -33,6 +33,8 @@ export default [
         File: 'readonly',
         EventTarget: 'readonly',
         crypto: 'readonly',
+        setTimeout: 'readonly',
+        clearTimeout: 'readonly',
       },
     },
     plugins: {

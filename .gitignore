@@ -29,3 +29,6 @@ src-tauri/gen/
 
 # Test snapshots pending
 **/*.snap.new
+
+# Claude
+.claude/

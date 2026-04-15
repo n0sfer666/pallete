@@ -1,16 +1,22 @@
 import { For, Show, type Component } from 'solid-js';
 import { writeText } from '@tauri-apps/plugin-clipboard-manager';
+import type { Color } from '~/ipc/types';
 import {
   projectState,
   addColor,
   removeColor,
   renamePalette,
   duplicatePalette,
+  updateColor,
 } from '~/store/project';
 import { selection, selectColor } from '~/store/selection';
 import { workspaceState } from '~/store/workspace';
 import layout from './Layout.module.css';
 import styles from './PaletteDetails.module.css';
+
+const HEX6_RE = /^#[0-9a-fA-F]{6}$/;
+const HEX8_RE = /^#[0-9a-fA-F]{8}$/;
+const RGB_RE = /^rgba?\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*(?:,\s*([\d.]+)\s*)?\)$/i;
 
 export const PaletteDetails: Component = () => {
   const activePalette = () => {
@@ -23,14 +29,37 @@ export const PaletteDetails: Component = () => {
 
   const handleCopy = async (hex: string, alpha: number): Promise<void> => {
     const format = workspaceState.workspace?.settings.copyFormat ?? 'hex';
-    const text = formatColor(hex, alpha, format);
-    await writeText(text);
+    await writeText(formatColor(hex, alpha, format));
   };
 
   const handleAddColor = (): void => {
     const pal = activePalette();
     if (!pal) return;
     addColor(pal.id, { hex: '#CCCCCC', alpha: 1 });
+  };
+
+  const commitHex = (paletteId: string, colorId: string, value: string): void => {
+    const v = value.startsWith('#') ? value : `#${value}`;
+    if (HEX8_RE.test(v)) {
+      const hex = v.slice(0, 7).toUpperCase();
+      const alpha = parseInt(v.slice(7, 9), 16) / 255;
+      updateColor(paletteId, colorId, { hex, alpha });
+      return;
+    }
+    if (HEX6_RE.test(v)) {
+      updateColor(paletteId, colorId, { hex: v.toUpperCase() });
+    }
+  };
+
+  const commitRgb = (paletteId: string, colorId: string, value: string): void => {
+    const m = RGB_RE.exec(value.trim());
+    if (!m) return;
+    const r = Math.min(255, Math.max(0, parseInt(m[1] ?? '0', 10)));
+    const g = Math.min(255, Math.max(0, parseInt(m[2] ?? '0', 10)));
+    const b = Math.min(255, Math.max(0, parseInt(m[3] ?? '0', 10)));
+    const a = m[4] !== undefined ? Math.min(1, Math.max(0, parseFloat(m[4]))) : 1;
+    const hex = `#${[r, g, b].map((n) => n.toString(16).padStart(2, '0')).join('')}`.toUpperCase();
+    updateColor(paletteId, colorId, { hex, alpha: a });
   };
 
   return (
@@ -58,24 +87,117 @@ export const PaletteDetails: Component = () => {
                     };
                     return (
                       <div
-                        classList={{ [styles.colorRow]: true, [styles.selected]: isSelected() }}
-                        onClick={() => selectColor(palette().id, c.id)}
+                        classList={{ [styles.colorItem]: true, [styles.selected]: isSelected() }}
                       >
-                        <div class={styles.chip} style={{ 'background-color': c.hex, opacity: c.alpha }} />
-                        <span class={styles.hex} onClick={(e) => { e.stopPropagation(); handleCopy(c.hex, c.alpha); }}>
-                          {c.hex}
-                        </span>
-                        <span class={styles.name}>{c.name ?? ''}</span>
-                        <span class={styles.role}>{c.role ?? ''}</span>
-                        <button
-                          class={styles.remove}
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            removeColor(palette().id, c.id);
-                          }}
+                        <div
+                          class={styles.colorRow}
+                          onClick={() => selectColor(palette().id, c.id)}
                         >
-                          ×
-                        </button>
+                          <label
+                            class={styles.chip}
+                            style={{ 'background-color': c.hex, opacity: c.alpha }}
+                            onClick={(e) => e.stopPropagation()}
+                          >
+                            <input
+                              type="color"
+                              value={c.hex}
+                              onChange={(e) =>
+                                updateColor(palette().id, c.id, {
+                                  hex: e.currentTarget.value.toUpperCase(),
+                                })
+                              }
+                            />
+                          </label>
+                          <Show
+                            when={isSelected()}
+                            fallback={<span class={styles.hex}>{toHexString(c)}</span>}
+                          >
+                            <input
+                              class={styles.editInput}
+                              value={toHexString(c)}
+                              onClick={(e) => e.stopPropagation()}
+                              onChange={(e) =>
+                                commitHex(palette().id, c.id, e.currentTarget.value)
+                              }
+                            />
+                          </Show>
+                          <Show
+                            when={isSelected()}
+                            fallback={<span class={styles.name}>{c.name ?? ''}</span>}
+                          >
+                            <input
+                              class={`${styles.editInput} ${styles.nameEdit}`}
+                              placeholder="имя"
+                              value={c.name ?? ''}
+                              onClick={(e) => e.stopPropagation()}
+                              onChange={(e) => {
+                                const v = e.currentTarget.value.trim();
+                                updateColor(palette().id, c.id, v ? { name: v } : {});
+                              }}
+                            />
+                          </Show>
+                          <button
+                            class={styles.copy}
+                            title="Копировать"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              void handleCopy(c.hex, c.alpha);
+                            }}
+                          >
+                            ⧉
+                          </button>
+                          <button
+                            class={styles.remove}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              removeColor(palette().id, c.id);
+                            }}
+                          >
+                            ×
+                          </button>
+                        </div>
+                        <Show when={isSelected()}>
+                          <div class={styles.editor}>
+                            <span>RGB</span>
+                            <input
+                              class={styles.editInput}
+                              value={toRgbString(c)}
+                              onChange={(e) =>
+                                commitRgb(palette().id, c.id, e.currentTarget.value)
+                              }
+                            />
+                            <span>Alpha</span>
+                            <div class={styles.alphaRow}>
+                              <input
+                                type="range"
+                                min="0"
+                                max="1"
+                                step="0.01"
+                                value={c.alpha}
+                                onInput={(e) =>
+                                  updateColor(palette().id, c.id, {
+                                    alpha: parseFloat(e.currentTarget.value),
+                                  })
+                                }
+                              />
+                              <input
+                                type="number"
+                                min="0"
+                                max="1"
+                                step="0.01"
+                                value={c.alpha}
+                                onChange={(e) => {
+                                  const v = parseFloat(e.currentTarget.value);
+                                  if (!Number.isNaN(v)) {
+                                    updateColor(palette().id, c.id, {
+                                      alpha: Math.min(1, Math.max(0, v)),
+                                    });
+                                  }
+                                }}
+                              />
+                            </div>
+                          </div>
+                        </Show>
                       </div>
                     );
                   }}
@@ -87,6 +209,19 @@ export const PaletteDetails: Component = () => {
       </div>
     </div>
   );
+};
+
+const toHexString = (c: Color): string => {
+  if (c.alpha >= 1) return c.hex;
+  const a = Math.round(c.alpha * 255).toString(16).padStart(2, '0').toUpperCase();
+  return `${c.hex}${a}`;
+};
+
+const toRgbString = (c: Color): string => {
+  const r = parseInt(c.hex.slice(1, 3), 16);
+  const g = parseInt(c.hex.slice(3, 5), 16);
+  const b = parseInt(c.hex.slice(5, 7), 16);
+  return c.alpha < 1 ? `rgba(${r}, ${g}, ${b}, ${c.alpha})` : `rgb(${r}, ${g}, ${b})`;
 };
 
 const formatColor = (hex: string, alpha: number, format: 'hex' | 'rgb' | 'hsl'): string => {

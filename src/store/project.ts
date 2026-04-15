@@ -104,6 +104,32 @@ export const addColor = (paletteId: string, color: Omit<Color, 'id'>): Color => 
   return created;
 };
 
+export const updateColor = (
+  paletteId: string,
+  colorId: string,
+  patch: Partial<Omit<Color, 'id'>>,
+): void => {
+  const pal = state.project?.palettes.find((x) => x.id === paletteId);
+  const color = pal?.colors.find((c) => c.id === colorId);
+  if (!pal || !color) return;
+  const prev: Color = { ...color };
+  const next: Color = { ...color, ...patch };
+  if (JSON.stringify(prev) === JSON.stringify(next)) return;
+  run({
+    label: 'update color',
+    apply: () => mutate((pr) => {
+      const p = pr.palettes.find((x) => x.id === paletteId);
+      const c = p?.colors.find((x) => x.id === colorId);
+      if (c) Object.assign(c, next);
+    }),
+    revert: () => mutate((pr) => {
+      const p = pr.palettes.find((x) => x.id === paletteId);
+      const c = p?.colors.find((x) => x.id === colorId);
+      if (c) Object.assign(c, prev);
+    }),
+  });
+};
+
 export const removeColor = (paletteId: string, colorId: string): void => {
   const pal = state.project?.palettes.find((x) => x.id === paletteId);
   if (!pal) return;

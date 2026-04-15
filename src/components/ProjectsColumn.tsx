@@ -2,10 +2,10 @@ import { For, type Component } from 'solid-js';
 import { open } from '@tauri-apps/plugin-dialog';
 import { projectState } from '~/store/project';
 import { openSettings } from '~/store/settings-dialog';
+import { openNewProject } from '~/store/new-project-dialog';
 import {
   workspaceState,
   openProject,
-  createProject,
   removeProjectFromWorkspace,
   addProjectToWorkspace,
 } from '~/store/workspace';
@@ -13,14 +13,6 @@ import styles from './Layout.module.css';
 import itemStyles from './ProjectsColumn.module.css';
 
 export const ProjectsColumn: Component = () => {
-  const handleNew = async (): Promise<void> => {
-    const dir = await open({ directory: true, multiple: false });
-    if (!dir || typeof dir !== 'string') return;
-    const name = window.prompt('Название проекта?');
-    if (!name) return;
-    await createProject(dir, name);
-  };
-
   const handleOpenFolder = async (): Promise<void> => {
     const file = await open({
       directory: false,
@@ -68,7 +60,7 @@ export const ProjectsColumn: Component = () => {
         </For>
       </div>
       <div class={styles.columnFooter}>
-        <button onClick={handleNew}>+ Новый</button>
+        <button onClick={openNewProject}>+ Новый</button>
         <button onClick={handleOpenFolder}>Открыть…</button>
         <button onClick={openSettings} title="Настройки" style={{ 'margin-inline-start': 'auto' }}>
           ⚙
