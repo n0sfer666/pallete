@@ -60,7 +60,7 @@ export const ProjectsColumn: Component = () => {
         </For>
       </div>
       <div class={styles.columnFooter}>
-        <button onClick={openNewProject}>+ Новый</button>
+        <button onClick={() => openNewProject()}>+ Новый</button>
         <button onClick={handleOpenFolder}>Открыть…</button>
         <button onClick={openSettings} title="Настройки" style={{ 'margin-inline-start': 'auto' }}>
           ⚙

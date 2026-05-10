@@ -2,9 +2,10 @@ import { createStore } from 'solid-js/store';
 import type { ParsedPalette, ParseOptionsDto, ParseResult } from '~/ipc/types';
 import { parseText } from '~/ipc/commands';
 import { run } from '~/store/undo';
-import { projectState } from '~/store/project';
-import { setProject } from '~/store/project';
-import { workspaceState } from '~/store/workspace';
+import { projectState, setProject, markDirty } from '~/store/project';
+import { workspaceState, openProject } from '~/store/workspace';
+import { openNewProject } from '~/store/new-project-dialog';
+import { openImportTarget } from '~/store/import-target-dialog';
 import { uuid } from '~/lib/uuid';
 
 export type DuplicateStrategy = 'merge' | 'replace' | 'skip';
@@ -76,7 +77,35 @@ export const findConflicts = (): ParsedPalette[] => {
   return state.result.palettes.filter((p) => existing.has(p.name.toLowerCase()));
 };
 
+const availableProjectPaths = (): string[] =>
+  (workspaceState.workspace?.projects ?? []).filter((p) => !p.missing).map((p) => p.path);
+
 export const applyImport = (strategy: DuplicateStrategy): void => {
+  if (!state.result) return;
+  if (projectState.project) {
+    applyToCurrentProject(strategy);
+    return;
+  }
+  if (availableProjectPaths().length === 0) {
+    importIntoNewProject(strategy);
+    return;
+  }
+  openImportTarget(strategy);
+};
+
+export const importIntoNewProject = (strategy: DuplicateStrategy): void => {
+  openNewProject(() => applyToCurrentProject(strategy));
+};
+
+export const importIntoExistingProject = async (
+  path: string,
+  strategy: DuplicateStrategy,
+): Promise<void> => {
+  await openProject(path);
+  applyToCurrentProject(strategy);
+};
+
+const applyToCurrentProject = (strategy: DuplicateStrategy): void => {
   const project = projectState.project;
   const result = state.result;
   if (!project || !result) return;
@@ -105,8 +134,14 @@ export const applyImport = (strategy: DuplicateStrategy): void => {
 
   run({
     label: 'import palettes',
-    apply: () => setProject(next, projectState.path),
-    revert: () => setProject(snapshot, projectState.path),
+    apply: () => {
+      setProject(next, projectState.path);
+      markDirty();
+    },
+    revert: () => {
+      setProject(snapshot, projectState.path);
+      markDirty();
+    },
   });
 
   closeImport();

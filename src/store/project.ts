@@ -19,6 +19,8 @@ export const setProject = (project: Project | null, path: string | null): void =
 
 export const markClean = (): void => setState('dirty', false);
 
+export const markDirty = (): void => setState('dirty', true);
+
 const mutate = (fn: (p: Project) => void): void => {
   setState('project', produce((p) => {
     if (p) fn(p);

@@ -1,7 +1,12 @@
 import { Show, createSignal, type Component } from 'solid-js';
 import { open } from '@tauri-apps/plugin-dialog';
 import { createProject } from '~/store/workspace';
-import { newProjectOpen, closeNewProject } from '~/store/new-project-dialog';
+import { projectState } from '~/store/project';
+import {
+  newProjectOpen,
+  closeNewProject,
+  consumeNewProjectCallback,
+} from '~/store/new-project-dialog';
 import styles from './NewProjectDialog.module.css';
 
 export const NewProjectDialog: Component = () => {
@@ -37,7 +42,10 @@ export const NewProjectDialog: Component = () => {
     setError(null);
     try {
       await createProject(d, n);
+      const cb = consumeNewProjectCallback();
+      const created = projectState.project;
       handleClose();
+      if (cb && created) cb(created);
     } catch (e) {
       setError(String(e));
       setBusy(false);

@@ -3,6 +3,7 @@ import { Layout } from '~/components/Layout';
 import { ImportDialog } from '~/components/ImportDialog';
 import { SettingsDialog } from '~/components/SettingsDialog';
 import { NewProjectDialog } from '~/components/NewProjectDialog';
+import { ImportTargetDialog } from '~/components/ImportTargetDialog';
 import { loadWorkspace } from '~/store/workspace';
 import { useThemeSync } from '~/store/theme';
 import { useGlobalShortcuts } from '~/hooks/useGlobalShortcuts';
@@ -27,6 +28,7 @@ export const App: Component = () => {
       <ImportDialog />
       <SettingsDialog />
       <NewProjectDialog />
+      <ImportTargetDialog />
     </>
   );
 };
