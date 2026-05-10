@@ -55,6 +55,33 @@ $bg: #FAFAFA;
 }
 
 #[test]
+fn snapshot_scss_sections() {
+    let input = "\
+// Gray Scale
+$gray-50: #fafafa;
+$gray-100: #f5f5f5;
+$gray-900: #171717;
+
+// Primary Colors (Ocean Theme)
+$ocean-50: #f0fdfa;
+$ocean-400: #40e0d0; // Main turquoise
+$ocean-900: #134e4a;
+
+// Semantic Colors
+$white: #fff;
+$black: #1a1a1a;
+
+// Status Colors
+$success-50: #f0fdf4;
+$success-500: #16a34a;
+$error-50: #fef2f2;
+$warning-50: #fefce8;
+";
+    let result = parse(input, &default_opts()).unwrap();
+    assert_yaml_snapshot!("scss_sections", result);
+}
+
+#[test]
 fn snapshot_bare_hex_list() {
     let input = "#111 #222 #333 #444";
     let result = parse(input, &default_opts()).unwrap();
