@@ -1,45 +1,48 @@
 # Pallete
 
-Лёгкий кроссплатформенный сборщик палитр. Собирает палитры из произвольно вставленного текста: ASCII-таблицы, Markdown, CSS/SCSS-переменные, голые списки hex.
+**English** · [Русский](./README.ru.md)
 
-Полностью офлайн, без телеметрии.
+A lightweight cross-platform palette collector. It builds palettes from arbitrary pasted text: ASCII tables, Markdown, CSS/SCSS variables, plain hex lists.
 
-📖 **Подробное описание возможностей и форматов импорта — [docs/description.md](./docs/description.md).**
+Fully offline, no telemetry.
 
-## Возможности
+📖 **Detailed features and import formats — [docs/description.md](./docs/description.md) (in Russian).**
 
-- Импорт палитр из произвольного текста: hex, `rgb()/rgba()`, ASCII-таблицы, Markdown, CSS/SCSS-переменные ([что можно и что нельзя импортировать](./docs/description.md#импорт-палитр))
-  - CSS/SCSS-переменные группируются в палитры по комментариям-секциям (`// Gray Scale`, `/* Status */`), а без них — по общему префиксу имени (`gray-*`, `ocean-*`)
-- Трёхколоночный layout: проекты → палитры → цвета
-- Undo/redo по командам
-- Копирование цвета по клику (hex / rgb / hsl, настраивается)
-- Drag-and-drop файла в окно для импорта
-- Тёмная/светлая/системная тема
+## Features
 
-## Горячие клавиши
+- Import palettes from arbitrary text: hex, `rgb()/rgba()`, ASCII tables, Markdown, CSS/SCSS variables ([what can and cannot be imported](./docs/description.md#импорт-палитр))
+  - CSS/SCSS variables are grouped into palettes by section comments (`// Gray Scale`, `/* Status */`), and without them — by a shared name prefix (`gray-*`, `ocean-*`)
+- [Palette generator](./docs/palette-generator.md) from a single base color in OKLCH: shades, tonal scale, gradient, alpha scale, harmonies, semantic set
+- Three-column layout: projects → palettes → colors
+- Command-based undo/redo
+- Click to copy a color (hex / rgb / hsl, configurable)
+- Drag-and-drop a file into the window to import
+- Dark / light / system theme
 
-- `Ctrl/Cmd+V` — импортировать палитру из буфера
+## Shortcuts
+
+- `Ctrl/Cmd+V` — import a palette from the clipboard
 - `Ctrl/Cmd+Z` / `Ctrl/Cmd+Shift+Z` — undo / redo
-- `Delete` / `Backspace` — удалить выбранную палитру или цвет
+- `Delete` / `Backspace` — delete the selected palette or color
 
-## Стек
+## Stack
 
 Tauri 2 (Rust) + SolidJS + Vite + TypeScript.
 
-## Разработка
+## Development
 
 ```sh
 pnpm install
 pnpm tauri dev
 ```
 
-## Сборка
+## Build
 
 ```sh
 pnpm tauri build
 ```
 
-## Первый запуск unsigned-билда
+## First launch of an unsigned build
 
 ### macOS (Gatekeeper)
 
@@ -47,16 +50,16 @@ pnpm tauri build
 xattr -dr com.apple.quarantine /Applications/Pallete.app
 ```
 
-Или: правый клик → «Open» → «Open anyway» в первый раз.
+Or: right click → "Open" → "Open anyway" the first time.
 
 ### Windows (SmartScreen)
 
-На экране предупреждения: «More info» → «Run anyway».
+On the warning screen: "More info" → "Run anyway".
 
 ### Linux
 
-Запускать `.AppImage` напрямую, при необходимости `chmod +x`.
+Run the `.AppImage` directly, `chmod +x` it if needed.
 
-## Лицензия
+## License
 
-MIT. См. [LICENSE](./LICENSE).
+MIT. See [LICENSE](./LICENSE).

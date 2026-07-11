@@ -32,3 +32,6 @@ src-tauri/gen/
 
 # Claude
 .claude/
+
+# Serena LSP index/cache
+.serena/

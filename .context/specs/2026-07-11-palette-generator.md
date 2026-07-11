@@ -122,7 +122,7 @@
   | tetradic (square) | 0, +90, +180, +270 |
 
 - **Светлота и хрома.** `base` — **точно выбранный hex**. Производные цвета получают L базы
-  и **одинаковую хрому** — минимальную из максимально допустимых в sRGB для их hue
+  и **одинаковую хрому** — минимум из хромы базы и максимально допустимых в sRGB хром для их hue
   (нормализация «в одну семью»). База в эту нормализацию не входит.
 - Имена: `base`, `complement`, `analogous-1`, `analogous-2`, `triadic-1`, `triadic-2`,
   `split-1`, `split-2`, `tetradic-1`…`tetradic-3`.
@@ -157,15 +157,16 @@
 src/lib/color/
   oklch.ts          # sRGB ↔ OKLab ↔ OKLCH, гамут-кламп по хроме
 src/lib/generate/
-  types.ts          # GeneratorMode, GeneratorParams (дискриминированное объединение)
+  types.ts          # GeneratorMode, GeneratedColor, Result/GenResult, лимит MAX_GENERATED
   steps.ts          # общий алгоритм ряда x→y→z (shade и alpha ramp)
+  base.ts           # parseBase(hex): единый разбор базового цвета в hex + OKLCH
   shade.ts
   tonal.ts          # таблицы L и bell, экспортируется и для semantic «со шкалой»
   interpolate.ts
-  alpha-ramp.ts
+  alpha.ts
   harmony.ts
   semantic.ts
-  index.ts          # generate(params): Result<Omit<Color,'id'>[], string>
+  index.ts          # GeneratorParams (поля всех режимов) + generate(params): GenResult
 src/store/
   generator.ts      # состояние по paletteId (в памяти), общий базовый цвет
   project.ts        # + replaceColors(paletteId, colors) — одна undo-операция
