@@ -41,32 +41,6 @@
   opacity: 0;
 }
 
-.fields {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: var(--spacing-2);
-}
-
-.field {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-1);
-  min-inline-size: 0;
-}
-
-.fieldLabel {
-  font-size: var(--font-size-xs);
-  color: var(--color-text-muted);
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-
-.field input {
-  inline-size: 100%;
-  min-inline-size: 0;
-  font-size: var(--font-size-sm);
-}
-
 .error {
   font-size: var(--font-size-sm);
   color: var(--color-danger);

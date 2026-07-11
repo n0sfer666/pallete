@@ -1,4 +1,5 @@
-import { hexToOklch, oklchToHex } from '~/lib/color/oklch';
+import { oklchToHex } from '~/lib/color/oklch';
+import { parseBase } from '~/lib/generate/base';
 import { buildSteps, SHADE_MAX } from '~/lib/generate/steps';
 import { fail, genOk, type GeneratedColor, type GenResult } from '~/lib/generate/types';
 
@@ -16,8 +17,9 @@ const hasDuplicates = (colors: GeneratedColor[]): boolean =>
   new Set(colors.map((color) => color.hex)).size !== colors.length;
 
 export const generateShade = (baseHex: string, params: ShadeParams): GenResult => {
-  const base = hexToOklch(baseHex);
-  if (base === null) return fail('Некорректный базовый цвет');
+  const parsed = parseBase(baseHex);
+  if (parsed === null) return fail('Некорректный базовый цвет');
+  const base = parsed.oklch;
 
   const series = buildSteps(params.from, params.to, params.step, SHADE_MAX);
   if (!series.ok) return fail(series.error);

@@ -7,6 +7,9 @@ import {
   disableGenerator,
   enableGenerator,
   setBaseHex,
+  setHarmonyScheme,
+  setMode,
+  setSemanticScale,
   setShadeParam,
 } from '~/store/generator';
 import { PaletteGenerator } from './PaletteGenerator';
@@ -20,7 +23,7 @@ const makeProject = (): Project => ({
   palettes: [],
 });
 
-const colorsOf = (): { id: string; hex: string; name?: string }[] =>
+const colorsOf = (): { id: string; hex: string; alpha: number; name?: string }[] =>
   projectState.project?.palettes[0]?.colors ?? [];
 
 const names = (): (string | undefined)[] => colorsOf().map((c) => c.name);
@@ -103,5 +106,38 @@ describe('PaletteGenerator', () => {
     setBaseHex(paletteId, '#FFFFFF');
     expect(colorsOf()).toHaveLength(0);
     expect(container.textContent).toContain('вырождается');
+  });
+
+  it('switches to harmony and exposes the scheme select', () => {
+    setMode(paletteId, 'harmony');
+    expect(names()).toEqual(['base', 'complement']);
+    expect(container.querySelectorAll('select')).toHaveLength(2);
+  });
+
+  it('shows the angle input only for angled harmony schemes', () => {
+    setMode(paletteId, 'harmony');
+    expect(container.querySelectorAll('input[type="number"]')).toHaveLength(0);
+    setHarmonyScheme(paletteId, 'analogous');
+    expect(container.querySelectorAll('input[type="number"]')).toHaveLength(1);
+    expect(names()).toEqual(['analogous-1', 'base', 'analogous-2']);
+  });
+
+  it('does not resurrect a cleared palette when a failing generator remounts', () => {
+    setShadeParam(paletteId, 'step', 0);
+    expect(colorsOf()).toHaveLength(0);
+    undo();
+    expect(colorsOf()).toHaveLength(10);
+    dispose();
+    dispose = render(() => <PaletteGenerator paletteId={paletteId} />, container);
+    expect(colorsOf()).toHaveLength(10);
+    expect(canRedo()).toBe(true);
+  });
+
+  it('expands the semantic set into scales when the checkbox is on', () => {
+    setMode(paletteId, 'semantic');
+    expect(names()).toEqual(['primary', 'success', 'warning', 'danger', 'info', 'neutral']);
+    setSemanticScale(paletteId, true);
+    expect(names()).toHaveLength(18);
+    expect(names()[0]).toBe('primary-light');
   });
 });
