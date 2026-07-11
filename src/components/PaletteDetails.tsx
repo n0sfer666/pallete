@@ -11,11 +11,11 @@ import {
 } from '~/store/project';
 import { selection, selectColor } from '~/store/selection';
 import { workspaceState } from '~/store/workspace';
+import { formatHex, parseHex, withAlpha } from '~/lib/color/hex';
+import type { Rgb } from '~/lib/color/types';
 import layout from './Layout.module.css';
 import styles from './PaletteDetails.module.css';
 
-const HEX6_RE = /^#[0-9a-fA-F]{6}$/;
-const HEX8_RE = /^#[0-9a-fA-F]{8}$/;
 const RGB_RE = /^rgba?\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*(?:,\s*([\d.]+)\s*)?\)$/i;
 
 export const PaletteDetails: Component = () => {
@@ -39,27 +39,26 @@ export const PaletteDetails: Component = () => {
   };
 
   const commitHex = (paletteId: string, colorId: string, value: string): void => {
-    const v = value.startsWith('#') ? value : `#${value}`;
-    if (HEX8_RE.test(v)) {
-      const hex = v.slice(0, 7).toUpperCase();
-      const alpha = parseInt(v.slice(7, 9), 16) / 255;
-      updateColor(paletteId, colorId, { hex, alpha });
+    const parsed = parseHex(value);
+    if (!parsed) return;
+    const hex = formatHex(parsed.rgb);
+    if (hex === null) return;
+    if (parsed.alpha === null) {
+      updateColor(paletteId, colorId, { hex });
       return;
     }
-    if (HEX6_RE.test(v)) {
-      updateColor(paletteId, colorId, { hex: v.toUpperCase() });
-    }
+    updateColor(paletteId, colorId, { hex, alpha: parsed.alpha });
   };
 
   const commitRgb = (paletteId: string, colorId: string, value: string): void => {
     const m = RGB_RE.exec(value.trim());
     if (!m) return;
-    const r = Math.min(255, Math.max(0, parseInt(m[1] ?? '0', 10)));
-    const g = Math.min(255, Math.max(0, parseInt(m[2] ?? '0', 10)));
-    const b = Math.min(255, Math.max(0, parseInt(m[3] ?? '0', 10)));
-    const a = m[4] !== undefined ? Math.min(1, Math.max(0, parseFloat(m[4]))) : 1;
-    const hex = `#${[r, g, b].map((n) => n.toString(16).padStart(2, '0')).join('')}`.toUpperCase();
-    updateColor(paletteId, colorId, { hex, alpha: a });
+    const channel = (raw: string | undefined): number =>
+      Math.min(255, Math.max(0, parseInt(raw ?? '0', 10))) / 255;
+    const hex = formatHex({ r: channel(m[1]), g: channel(m[2]), b: channel(m[3]) });
+    if (hex === null) return;
+    const alpha = m[4] !== undefined ? Math.min(1, Math.max(0, parseFloat(m[4]))) : 1;
+    updateColor(paletteId, colorId, { hex, alpha });
   };
 
   return (
@@ -211,49 +210,36 @@ export const PaletteDetails: Component = () => {
   );
 };
 
-const toHexString = (c: Color): string => {
-  if (c.alpha >= 1) return c.hex;
-  const a = Math.round(c.alpha * 255).toString(16).padStart(2, '0').toUpperCase();
-  return `${c.hex}${a}`;
-};
+const toHexString = (c: Color): string => withAlpha(c.hex, c.alpha) ?? c.hex;
 
-const toRgbString = (c: Color): string => {
-  const r = parseInt(c.hex.slice(1, 3), 16);
-  const g = parseInt(c.hex.slice(3, 5), 16);
-  const b = parseInt(c.hex.slice(5, 7), 16);
-  return c.alpha < 1 ? `rgba(${r}, ${g}, ${b}, ${c.alpha})` : `rgb(${r}, ${g}, ${b})`;
-};
+const toRgbString = (c: Color): string => formatColor(c.hex, c.alpha, 'rgb');
 
 const formatColor = (hex: string, alpha: number, format: 'hex' | 'rgb' | 'hsl'): string => {
   if (format === 'hex') return hex;
-  const r = parseInt(hex.slice(1, 3), 16);
-  const g = parseInt(hex.slice(3, 5), 16);
-  const b = parseInt(hex.slice(5, 7), 16);
-  if (format === 'rgb') {
-    return alpha < 1 ? `rgba(${r}, ${g}, ${b}, ${alpha})` : `rgb(${r}, ${g}, ${b})`;
-  }
-  return hexToHsl(r, g, b, alpha);
+  const parsed = parseHex(hex);
+  if (!parsed) return hex;
+  if (format === 'rgb') return rgbToCss(parsed.rgb, alpha);
+  return rgbToHsl(parsed.rgb, alpha);
 };
 
-const hexToHsl = (r: number, g: number, b: number, a: number): string => {
-  const rn = r / 255;
-  const gn = g / 255;
-  const bn = b / 255;
-  const max = Math.max(rn, gn, bn);
-  const min = Math.min(rn, gn, bn);
+const rgbToCss = ({ r, g, b }: Rgb, a: number): string => {
+  const channels = [r, g, b].map((channel) => Math.round(channel * 255)).join(', ');
+  return a < 1 ? `rgba(${channels}, ${a})` : `rgb(${channels})`;
+};
+
+const rgbToHsl = ({ r, g, b }: Rgb, a: number): string => {
+  const max = Math.max(r, g, b);
+  const min = Math.min(r, g, b);
   const l = (max + min) / 2;
-  let h = 0;
-  let s = 0;
-  if (max !== min) {
-    const d = max - min;
-    s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
-    if (max === rn) h = (gn - bn) / d + (gn < bn ? 6 : 0);
-    else if (max === gn) h = (bn - rn) / d + 2;
-    else h = (rn - gn) / d + 4;
-    h *= 60;
-  }
-  const H = Math.round(h);
-  const S = Math.round(s * 100);
-  const L = Math.round(l * 100);
-  return a < 1 ? `hsla(${H}, ${S}%, ${L}%, ${a})` : `hsl(${H}, ${S}%, ${L}%)`;
+  const d = max - min;
+  const s = d === 0 ? 0 : d / (l > 0.5 ? 2 - max - min : max + min);
+  const h = d === 0 ? 0 : hueOf({ r, g, b }, max, d) * 60;
+  const parts = `${Math.round(h)}, ${Math.round(s * 100)}%, ${Math.round(l * 100)}%`;
+  return a < 1 ? `hsla(${parts}, ${a})` : `hsl(${parts})`;
+};
+
+const hueOf = ({ r, g, b }: Rgb, max: number, d: number): number => {
+  if (max === r) return (g - b) / d + (g < b ? 6 : 0);
+  if (max === g) return (b - r) / d + 2;
+  return (r - g) / d + 4;
 };
