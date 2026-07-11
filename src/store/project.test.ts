@@ -8,8 +8,9 @@ import {
   duplicatePalette,
   addColor,
   removeColor,
+  replaceColors,
 } from '~/store/project';
-import { undo, redo, clearHistory } from '~/store/undo';
+import { undo, redo, clearHistory, canUndo } from '~/store/undo';
 import type { Project } from '~/ipc/types';
 
 const makeProject = (): Project => ({
@@ -75,5 +76,46 @@ describe('project store', () => {
     const p = addPalette('Keep');
     renamePalette(p.id, '   ');
     expect(projectState.project?.palettes[0]?.name).toBe('Keep');
+  });
+
+  it('replaces colors as a single undoable step', () => {
+    const p = addPalette('Gen');
+    addColor(p.id, { hex: '#111111', alpha: 1 });
+    replaceColors(p.id, [
+      { hex: '#AAAAAA', alpha: 1, name: '50' },
+      { hex: '#BBBBBB', alpha: 1, name: '100' },
+      { hex: '#CCCCCC', alpha: 1, name: '200' },
+    ]);
+    expect(projectState.project?.palettes[0]?.colors).toHaveLength(3);
+    undo();
+    const colors = projectState.project?.palettes[0]?.colors;
+    expect(colors).toHaveLength(1);
+    expect(colors?.[0]?.hex).toBe('#111111');
+    redo();
+    expect(projectState.project?.palettes[0]?.colors[2]?.name).toBe('200');
+  });
+
+  it('assigns fresh ids to replaced colors', () => {
+    const p = addPalette('Gen');
+    replaceColors(p.id, [{ hex: '#AAAAAA', alpha: 1, name: '50' }]);
+    const first = projectState.project?.palettes[0]?.colors[0]?.id;
+    replaceColors(p.id, [{ hex: '#BBBBBB', alpha: 1, name: '50' }]);
+    const second = projectState.project?.palettes[0]?.colors[0]?.id;
+    expect(first).toBeTruthy();
+    expect(second).not.toBe(first);
+  });
+
+  it('skips undo entry when colors are unchanged', () => {
+    const p = addPalette('Gen');
+    replaceColors(p.id, [{ hex: '#AAAAAA', alpha: 1, name: '50' }]);
+    clearHistory();
+    replaceColors(p.id, [{ hex: '#AAAAAA', alpha: 1, name: '50' }]);
+    expect(canUndo()).toBe(false);
+  });
+
+  it('ignores replace for unknown palette', () => {
+    addPalette('Gen');
+    replaceColors('missing', [{ hex: '#AAAAAA', alpha: 1 }]);
+    expect(projectState.project?.palettes[0]?.colors).toHaveLength(0);
   });
 });

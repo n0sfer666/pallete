@@ -2,6 +2,7 @@ import { createStore, produce } from 'solid-js/store';
 import type { Color, Palette, Project } from '~/ipc/types';
 import { uuid } from '~/lib/uuid';
 import { run } from '~/store/undo';
+import { clearGenerators, disableGenerator } from '~/store/generator';
 
 interface ProjectState {
   project: Project | null;
@@ -14,6 +15,7 @@ const [state, setState] = createStore<ProjectState>({ project: null, path: null,
 export { state as projectState };
 
 export const setProject = (project: Project | null, path: string | null): void => {
+  clearGenerators();
   setState({ project, path, dirty: false });
 };
 
@@ -48,7 +50,10 @@ export const removePalette = (id: string): void => {
   const snapshot: Palette = JSON.parse(JSON.stringify(palette));
   run({
     label: 'remove palette',
-    apply: () => mutate((pr) => { pr.palettes.splice(idx, 1); }),
+    apply: () => {
+      disableGenerator(id);
+      mutate((pr) => { pr.palettes.splice(idx, 1); });
+    },
     revert: () => mutate((pr) => { pr.palettes.splice(idx, 0, snapshot); }),
   });
 };
@@ -149,6 +154,28 @@ export const removeColor = (paletteId: string, colorId: string): void => {
     revert: () => mutate((pr) => {
       const p = pr.palettes.find((x) => x.id === paletteId);
       if (p) p.colors.splice(idx, 0, snap);
+    }),
+  });
+};
+
+const shapeOf = (colors: Omit<Color, 'id'>[]): string =>
+  JSON.stringify(colors.map((c) => [c.hex, c.alpha, c.name ?? null, c.role ?? null]));
+
+export const replaceColors = (paletteId: string, colors: Omit<Color, 'id'>[]): void => {
+  const pal = state.project?.palettes.find((x) => x.id === paletteId);
+  if (!pal) return;
+  const prev: Color[] = pal.colors.map((c) => ({ ...c }));
+  const next: Color[] = colors.map((c) => ({ ...c, id: uuid() }));
+  if (shapeOf(prev) === shapeOf(next)) return;
+  run({
+    label: 'generate palette',
+    apply: () => mutate((pr) => {
+      const p = pr.palettes.find((x) => x.id === paletteId);
+      if (p) p.colors = next.map((c) => ({ ...c }));
+    }),
+    revert: () => mutate((pr) => {
+      const p = pr.palettes.find((x) => x.id === paletteId);
+      if (p) p.colors = prev.map((c) => ({ ...c }));
     }),
   });
 };

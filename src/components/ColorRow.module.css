@@ -1,0 +1,130 @@
+.colorItem {
+  border-radius: var(--radius-sm);
+}
+
+.colorItem:hover {
+  background: var(--color-surface-hover);
+}
+
+.colorItem.selected {
+  background: var(--color-selected);
+}
+
+.colorRow {
+  display: grid;
+  grid-template-columns: 32px 100px 1fr 24px 24px;
+  gap: var(--spacing-2);
+  align-items: center;
+  padding-block: var(--spacing-2);
+  padding-inline: var(--spacing-2);
+  cursor: pointer;
+  font-size: var(--font-size-sm);
+}
+
+.chip {
+  inline-size: 32px;
+  block-size: 32px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--color-border);
+  padding: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+.chip input[type='color'] {
+  inline-size: 100%;
+  block-size: 100%;
+  border: none;
+  padding: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+.editInput {
+  font: inherit;
+  font-family: ui-monospace, 'SF Mono', Menlo, monospace;
+  background: var(--color-surface);
+  color: var(--color-text);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  padding-block: var(--spacing-1);
+  padding-inline: var(--spacing-2);
+  inline-size: 100%;
+  min-inline-size: 0;
+}
+
+.nameEdit {
+  font-family: inherit;
+}
+
+.copy {
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+  padding: 0;
+}
+
+.copy:hover {
+  color: var(--color-accent);
+}
+
+.hex {
+  font-family: ui-monospace, 'SF Mono', Menlo, monospace;
+  cursor: pointer;
+}
+
+.hex:hover {
+  color: var(--color-accent);
+}
+
+.name {
+  color: var(--color-text-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.remove {
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-lg);
+  padding: 0;
+  line-height: 1;
+}
+
+.remove:hover {
+  color: var(--color-danger);
+}
+
+.editor {
+  display: grid;
+  grid-template-columns: 60px 1fr;
+  gap: var(--spacing-2);
+  align-items: center;
+  padding-block: var(--spacing-2);
+  padding-inline: var(--spacing-2);
+  padding-block-start: 0;
+  font-size: var(--font-size-sm);
+}
+
+.editor span {
+  color: var(--color-text-muted);
+}
+
+.alphaRow {
+  display: flex;
+  gap: var(--spacing-2);
+  align-items: center;
+}
+
+.alphaRow input[type='range'] {
+  flex: 1;
+}
+
+.alphaRow input[type='number'] {
+  inline-size: 64px;
+}

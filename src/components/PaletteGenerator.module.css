@@ -1,0 +1,73 @@
+.panel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-2);
+  padding: var(--spacing-3);
+  margin-block-end: var(--spacing-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+}
+
+.controls {
+  display: flex;
+  gap: var(--spacing-2);
+  align-items: center;
+}
+
+.mode {
+  flex: 1;
+  font-size: var(--font-size-sm);
+}
+
+.swatch {
+  inline-size: 32px;
+  block-size: 32px;
+  flex: none;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  padding: 0;
+  cursor: pointer;
+  overflow: hidden;
+}
+
+.swatch input[type='color'] {
+  inline-size: 100%;
+  block-size: 100%;
+  border: none;
+  padding: 0;
+  background: transparent;
+  cursor: pointer;
+  opacity: 0;
+}
+
+.fields {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--spacing-2);
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-1);
+  min-inline-size: 0;
+}
+
+.fieldLabel {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.field input {
+  inline-size: 100%;
+  min-inline-size: 0;
+  font-size: var(--font-size-sm);
+}
+
+.error {
+  font-size: var(--font-size-sm);
+  color: var(--color-danger);
+}
